@@ -9,6 +9,7 @@ const PORT = 5000;
 
 // Enable CORS for frontend interaction
 app.use(cors());
+app.use('/tmp', express.static('/tmp'));
 
 // Configure the storage and file filter
 const storage = multer.diskStorage({
@@ -49,6 +50,30 @@ const upload = multer({
     limits: { fileSize: 1024 * 1024 * 1024 }, // Set file size limit
 }).single('file');
 
+
+// API to fetch uploaded files from /tmp directory
+app.get("/files", (req, res) => {
+  const tempDir = '/tmp';
+  fs.readdir(tempDir, (err, files) => {
+      if (err) {
+          console.error("Error reading /tmp directory:", err);
+          return res.status(500).json({ message: "Unable to fetch files" });
+      }
+      if (!files || files.length === 0) {
+          return res.status(404).json({ message: "No files found" });
+      }
+
+      // Respond with file names and paths
+      const fileDetails = files.map((file) => ({
+          name: file,
+          path: `${tempDir}/${file}`,
+      }));
+
+      res.status(200).json({ files: fileDetails });
+  });
+});
+
+
 // Endpoint to handle file uploads
 app.post('/upload', (req, res) => {
     upload(req, res, (err) => {
@@ -72,7 +97,7 @@ app.post('/upload', (req, res) => {
 });
 
 // Serve static files in /tmp directory for testing (optional, for local use only)
-app.use('/tmp', express.static('/tmp'));
+
 
 // Start the server
 app.listen(PORT, () => {
