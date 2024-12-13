@@ -51,24 +51,33 @@ const upload = multer({
 }).single('file');
 
 
-// API to fetch uploaded files from /tmp directory
 app.get("/files", (req, res) => {
-  const tempDir = '/tmp';
+  const tempDir = '/tmp'; // Temporary directory used for file uploads
+
+  // Check if the directory exists
+  if (!fs.existsSync(tempDir)) {
+      return res.status(404).json({ message: "Temporary directory does not exist" });
+  }
+
+  // Read the directory contents
   fs.readdir(tempDir, (err, files) => {
       if (err) {
           console.error("Error reading /tmp directory:", err);
-          return res.status(500).json({ message: "Unable to fetch files" });
-      }
-      if (!files || files.length === 0) {
-          return res.status(404).json({ message: "No files found" });
+          return res.status(500).json({ message: "Unable to fetch files", error: err.message });
       }
 
-      // Respond with file names and paths
+      // Check if there are files in the directory
+      if (!files || files.length === 0) {
+          return res.status(404).json({ message: "No files found in the temporary directory" });
+      }
+
+      // Map the file details
       const fileDetails = files.map((file) => ({
           name: file,
-          path: `${tempDir}/${file}`,
+          path: `/tmp/${file}`,
       }));
 
+      // Respond with the file details
       res.status(200).json({ files: fileDetails });
   });
 });
