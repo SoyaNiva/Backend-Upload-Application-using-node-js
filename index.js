@@ -54,11 +54,6 @@ const upload = multer({
 app.get("/files", (req, res) => {
   const tempDir = '/tmp'; // Temporary directory used for file uploads
 
-  // Check if the directory exists
-  if (!fs.existsSync(tempDir)) {
-      return res.status(404).json({ message: "Temporary directory does not exist" });
-  }
-
   // Read the directory contents
   fs.readdir(tempDir, (err, files) => {
       if (err) {
@@ -68,6 +63,7 @@ app.get("/files", (req, res) => {
 
       // Check if there are files in the directory
       if (!files || files.length === 0) {
+          console.log("No files found in the temporary directory.");
           return res.status(404).json({ message: "No files found in the temporary directory" });
       }
 
@@ -81,6 +77,7 @@ app.get("/files", (req, res) => {
       res.status(200).json({ files: fileDetails });
   });
 });
+
 
 
 // Endpoint to handle file uploads
