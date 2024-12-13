@@ -88,6 +88,11 @@ const storage = multer.diskStorage({
 //     }
 // });
 
+app.get('/', (req, res) => {
+  res.send('Hello World!')
+})
+
+
 // API to fetch uploaded files
 app.get("/files", (req, res) => {
     fs.readdir(uploadDir, (err, files) => {
