@@ -50,6 +50,9 @@ const upload = multer({
     limits: { fileSize: 1024 * 1024 * 1024 }, // Set file size limit
 }).single('file');
 
+app.get('/', (req, res) => {
+    res.send('Hello World!')
+  })
 
 app.get("/files", (req, res) => {
   const tempDir = '/tmp'; // Temporary directory used for file uploads
